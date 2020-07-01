@@ -21,26 +21,33 @@ public abstract class BaseHelpCommand extends BaseCommand {
     private final String header;
     private final int commandsPerPage;
     private final boolean hideUnpermittedCommands;
+    private final boolean showAliases;
 
     protected BaseHelpCommand(@NotNull CommandManager commandManager, @NotNull String parent, @Nullable String header) {
-        this(commandManager, parent, header, 9, true);
+        this(commandManager, parent, header, true);
     }
 
-    protected BaseHelpCommand(@NotNull CommandManager commandManager, @NotNull String parent, @Nullable String header, int commandsPerPage,
-                              boolean hideUnpermittedCommands) {
+    protected BaseHelpCommand(@NotNull CommandManager commandManager, @NotNull String parent, @Nullable String header,
+                              boolean showAliases) {
+        this(commandManager, parent, header, showAliases, 9, true);
+    }
+
+    protected BaseHelpCommand(@NotNull CommandManager commandManager, @NotNull String parent, @Nullable String header,
+                              boolean showAliases, int commandsPerPage, boolean hideUnpermittedCommands) {
         super(parent, "help");
 
-        this.aliases.add("?");
-        this.argsUsage = "[page=1]";
-        this.argsAlternatives.add("1");
-        this.minArgs = 0;
-        this.maxArgs = 1;
-        this.playerOnly = false;
-        this.description = "Shows a list of all the commands";
+        addAlias("?");
+        setArgsUsage("[page=1]");
+        addArgsAlternative("1");
+        setMinArgs(0);
+        setMaxArgs(1);
+        setPlayerOnly(false);
+        setDescription("Shows a list of all the commands");
 
         this.commandList = commandManager.getCommandList(parent);
         this.commandsPerPage = commandsPerPage;
         this.hideUnpermittedCommands = hideUnpermittedCommands;
+        this.showAliases = showAliases;
         this.header = header;
     }
 
@@ -100,7 +107,7 @@ public abstract class BaseHelpCommand extends BaseCommand {
         StringBuilder sb = new StringBuilder();
         for (BaseCommand c : commands) {
             if (!sb.toString().isEmpty()) sb.append(newLine);
-            sb.append(c.getUsage(messageReceiver)).append(" ").append(c.getDescription());
+            sb.append(c.getUsage(messageReceiver, showAliases)).append(" ").append(c.getDescription());
         }
         return sb.toString();
     }

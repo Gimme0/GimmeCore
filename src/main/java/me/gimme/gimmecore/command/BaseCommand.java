@@ -1,6 +1,8 @@
 package me.gimme.gimmecore.command;
 
 import com.google.common.base.Strings;
+import lombok.Getter;
+import lombok.Setter;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -48,16 +50,28 @@ public abstract class BaseCommand {
     private static final ChatColor COLOR_ARGS_USAGE = ChatColor.DARK_AQUA;
     private static final ChatColor COLOR_DESCRIPTION = ChatColor.YELLOW;
 
+    @Getter
     private String parent;
+    @Getter
     private String name;
-    protected List<String> aliases = new ArrayList<>();
-    protected String argsUsage = "";
-    protected List<String> argsAlternatives = new ArrayList<>();
-    protected int minArgs = 0;
-    protected int maxArgs = 0;
-    protected boolean playerOnly = false;
-    protected String description = "";
-    protected String permission = null;
+    @Getter
+    private List<String> aliases = new ArrayList<>();
+    @Setter
+    private String argsUsage = "";
+    @Getter
+    private List<String> argsAlternatives = new ArrayList<>();
+    @Setter
+    private int minArgs = 0;
+    @Setter
+    private int maxArgs = 0;
+    @Getter
+    @Setter
+    private boolean playerOnly = false;
+    @Setter
+    private String description = "";
+    @Getter
+    @Setter
+    private String permission = null;
 
     protected BaseCommand(@NotNull String parent, @NotNull String name) {
         this.parent = parent;
@@ -183,33 +197,28 @@ public abstract class BaseCommand {
     }
 
     /**
-     * @return the parent command name
+     * Adds an alias for this command.
+     *
+     * @param alias the alias to add
      */
-    @NotNull
-    public String getParent() {
-        return parent;
+    public void addAlias(@NotNull String alias) {
+        this.aliases.add(alias);
     }
 
     /**
-     * @return the command name
+     * Adds an arguments alternative for this command.
+     *
+     * @param argsAlternative the arguments alternative to add
      */
-    @NotNull
-    public String getName() {
-        return name;
-    }
-
-    /**
-     * @return the commands aliases
-     */
-    public List<String> getAliases() {
-        return aliases;
+    public void addArgsAlternative(@NotNull String argsAlternative) {
+        this.argsAlternatives.add(argsAlternative);
     }
 
     /**
      * @return the command usage
      */
     public String getUsage() {
-        return getUsage(COLOR_COMMAND, COLOR_ARGS_USAGE);
+        return getUsage(COLOR_COMMAND, COLOR_ARGS_USAGE, false);
     }
 
     /**
@@ -218,21 +227,23 @@ public abstract class BaseCommand {
      * @param sender the sender of the command
      * @return the command usage
      */
-    public String getUsage(CommandSender sender) {
+    public String getUsage(CommandSender sender, boolean showAliases) {
         ChatColor commandColor = COLOR_COMMAND;
         ChatColor argsColor = COLOR_ARGS_USAGE;
 
         boolean permission = isPermitted(sender) && !(isPlayerOnly() && !(sender instanceof Player));
 
         if (!permission) commandColor = COLOR_COMMAND_NO_PERMISSION;
-        return getUsage(commandColor, argsColor);
+        return getUsage(commandColor, argsColor, showAliases);
     }
 
-    private String getUsage(ChatColor commandColor, ChatColor argsColor) {
+    private String getUsage(ChatColor commandColor, ChatColor argsColor, boolean showAliases) {
         StringBuilder sb = new StringBuilder(commandColor + "/" + parent + " " + name);
 
-        for (String alias : aliases) {
-            sb.append(",").append(alias);
+        if (showAliases) {
+            for (String alias : aliases) {
+                sb.append(",").append(alias);
+            }
         }
         if (!argsUsage.isEmpty()) {
             sb.append(argsColor).append(" ").append(argsUsage);
@@ -242,32 +253,10 @@ public abstract class BaseCommand {
     }
 
     /**
-     * @return the arguments alternatives
-     */
-    public List<String> getArgsAlternatives() {
-        return argsAlternatives;
-    }
-
-    /**
-     * @return if the command is for players only
-     */
-    public boolean isPlayerOnly() {
-        return playerOnly;
-    }
-
-    /**
      * @return the command description
      */
     public String getDescription() {
         return COLOR_DESCRIPTION + description;
-    }
-
-    /**
-     * @return the command permission
-     */
-    @Nullable
-    public String getPermission() {
-        return permission;
     }
 
 }

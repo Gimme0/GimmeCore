@@ -1,4 +1,4 @@
-package me.gimme.gimmecore.scoreboard;
+package me.gimme.gimmecore.util.countdown;
 
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -9,15 +9,18 @@ public abstract class CountdownTimerTask extends BukkitRunnable {
     private Plugin plugin;
     private long seconds;
 
-    protected CountdownTimerTask(Plugin plugin, long seconds) {
+    protected CountdownTimerTask(@NotNull Plugin plugin, long seconds) {
         this.plugin = plugin;
         this.seconds = seconds;
     }
 
     @Override
     public void run() {
-        onCount();
-        if (seconds-- <= 0) finish();
+        if (seconds > 0) {
+            onCount();
+            seconds--;
+        }
+        else finish();
     }
 
     public void finish() {

@@ -100,7 +100,13 @@ public abstract class BaseCommand {
             return;
         }
 
-        String confirmationMessage = execute(sender, args);
+        String confirmationMessage;
+        try {
+            confirmationMessage = execute(sender, args);
+        } catch (CommandUsageException e) {
+            confirmationMessage = e.getMessage();
+        }
+
         if (confirmationMessage != null) {
             sender.sendMessage(confirmationMessage);
         }
@@ -113,9 +119,10 @@ public abstract class BaseCommand {
      * @param sender the sender of the command
      * @param args   the arguments used for this command
      * @return the return message, or null if no message should be sent
+     * @throws CommandUsageException if the command was supplied invalid arguments
      */
     @Nullable
-    protected abstract String execute(@NotNull final CommandSender sender, @NotNull final String[] args);
+    protected abstract String execute(@NotNull final CommandSender sender, @NotNull final String[] args) throws CommandUsageException;
 
     /**
      * Returns if the sender has permission for this command.
@@ -194,6 +201,36 @@ public abstract class BaseCommand {
     @NotNull
     protected String errorMessage(@NotNull String customMessage) {
         return ChatColor.RED + customMessage;
+    }
+
+    /**
+     * Requires an argument to be an integer and returns the parsed version of it, or throws a {@link CommandUsageException}.
+     *
+     * @param arg the command argument
+     * @return the argument as an integer
+     * @throws CommandUsageException if the argument does not contain a parsable integer
+     */
+    protected int requireInt(@NotNull String arg) throws CommandUsageException {
+        try {
+            return Integer.parseInt(arg);
+        } catch (NumberFormatException e) {
+            throw new CommandUsageException(errorMessageWithUsage(CommandError.NOT_A_NUMBER, arg));
+        }
+    }
+
+    /**
+     * Requires an argument to be a double and returns the parsed version of it, or throws a {@link CommandUsageException}.
+     *
+     * @param arg the command argument
+     * @return the argument as a double
+     * @throws CommandUsageException if the argument does not contain a parsable double
+     */
+    protected double requireDouble(@NotNull String arg) throws CommandUsageException {
+        try {
+            return Double.parseDouble(arg);
+        } catch (NumberFormatException e) {
+            throw new CommandUsageException(errorMessageWithUsage(CommandError.NOT_A_NUMBER, arg));
+        }
     }
 
     /**

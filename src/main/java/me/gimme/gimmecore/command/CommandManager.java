@@ -128,6 +128,15 @@ public class CommandManager implements TabExecutor {
     }
 
     /**
+     * Registers a basic help command for all commands under the specified parent.
+     *
+     * @param parent the parent command name
+     */
+    public void registerBasicHelpCommand(String parent) {
+        register(new BaseHelpCommand(this, parent, null, true) {});
+    }
+
+    /**
      * Registers a placeholder string that represents a list of other arguments to be used during tab completion in
      * its place. For example, if you register the placeholder "%team%" with a reference to a collection of your
      * custom Team objects and the function Team::getName, then every instance of the term %team% in your commands'

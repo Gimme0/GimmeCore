@@ -20,20 +20,20 @@ public abstract class BaseHelpCommand extends BaseCommand {
     private final List<BaseCommand> commandList;
     private final String header;
     private final int commandsPerPage;
-    private final boolean hideUnpermittedCommands;
-    private final boolean showAliases;
+    private final boolean showUnpermittedCommands;
+    private final boolean hideAliases;
 
     protected BaseHelpCommand(@NotNull CommandManager commandManager, @NotNull String parent, @Nullable String header) {
-        this(commandManager, parent, header, true);
+        this(commandManager, parent, header, false);
     }
 
     protected BaseHelpCommand(@NotNull CommandManager commandManager, @NotNull String parent, @Nullable String header,
-                              boolean showAliases) {
-        this(commandManager, parent, header, showAliases, 9, true);
+                              boolean hideAliases) {
+        this(commandManager, parent, header, hideAliases, 9, false);
     }
 
     protected BaseHelpCommand(@NotNull CommandManager commandManager, @NotNull String parent, @Nullable String header,
-                              boolean showAliases, int commandsPerPage, boolean hideUnpermittedCommands) {
+                              boolean hideAliases, int commandsPerPage, boolean showUnpermittedCommands) {
         super(parent, "help");
 
         addAlias("?");
@@ -46,8 +46,8 @@ public abstract class BaseHelpCommand extends BaseCommand {
 
         this.commandList = commandManager.getCommandList(parent);
         this.commandsPerPage = commandsPerPage;
-        this.hideUnpermittedCommands = hideUnpermittedCommands;
-        this.showAliases = showAliases;
+        this.showUnpermittedCommands = showUnpermittedCommands;
+        this.hideAliases = hideAliases;
         this.header = header;
     }
 
@@ -66,7 +66,7 @@ public abstract class BaseHelpCommand extends BaseCommand {
         int perPage = (sender instanceof ConsoleCommandSender) ? -1 : commandsPerPage;
 
         List<BaseCommand> commandListSnapshot = new ArrayList<>(commandList);
-        if (hideUnpermittedCommands && !(sender instanceof ConsoleCommandSender))
+        if (!showUnpermittedCommands && !(sender instanceof ConsoleCommandSender))
             commandListSnapshot.removeIf(command -> !command.isPermitted(sender));
 
         Pageifier.PageResult<BaseCommand> pageResult = Pageifier.getPage(commandListSnapshot, perPage, page);
@@ -107,7 +107,7 @@ public abstract class BaseHelpCommand extends BaseCommand {
         StringBuilder sb = new StringBuilder();
         for (BaseCommand c : commands) {
             if (!sb.toString().isEmpty()) sb.append(newLine);
-            sb.append(c.getUsage(messageReceiver, showAliases)).append(" ").append(c.getDescription());
+            sb.append(c.getUsage(messageReceiver, !hideAliases)).append(" ").append(c.getDescription());
         }
         return sb.toString();
     }

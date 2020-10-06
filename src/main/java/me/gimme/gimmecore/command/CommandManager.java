@@ -12,10 +12,12 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 import java.util.function.Function;
+import java.util.function.Supplier;
 import java.util.logging.Level;
 
 /**
  * Handles the execution and tab completion of all commands.
+ * <p>
  * All commands need to be registered first.
  */
 public class CommandManager implements TabExecutor {
@@ -133,27 +135,30 @@ public class CommandManager implements TabExecutor {
      * @param parent the parent command name
      */
     public void registerBasicHelpCommand(String parent) {
-        register(new BaseHelpCommand(this, parent, null, true) {});
+        register(new BaseHelpCommand(this, parent, null, true) {
+        });
     }
 
     /**
-     * Registers a placeholder string that represents a list of other arguments to be used during tab completion in
-     * its place. For example, if you register the placeholder "%team%" with a reference to a collection of your
-     * custom Team objects and the function Team::getName, then every instance of the term %team% in your commands'
-     * args alternatives is replaced with all the names of the teams during tab completion.
+     * Registers a placeholder string that represents a list of other arguments to be used during tab completion in its
+     * place.
+     * <p>
+     * For example, if you register the placeholder "%team%" with a supplier of a collection of your custom Team objects
+     * and the function Team::getName, then every instance of the term %team% in your commands' args alternatives is
+     * replaced with all the names of the teams during tab completion.
      *
      * @param placeholder    the placeholder string for the collection
-     * @param collection     the collection of data to get the strings from for the placeholder
+     * @param supplier       a supplier of the collection of data to get the strings from for the placeholder
      * @param stringFunction a function on the collection's objects that returns a string
      * @param <T>            the type of data to get the strings from
      * @throws IllegalArgumentException if the placeholder string is the same as {@link this#WILDCARD_PLACEHOLDER}
      */
     public <T> void registerPlaceholder(@NotNull String placeholder,
-                                        @NotNull Collection<T> collection,
+                                        @NotNull Supplier<Collection<? extends T>> supplier,
                                         @NotNull Function<? super T, ? extends String> stringFunction) {
         if (placeholder.equals(WILDCARD_PLACEHOLDER))
             throw new IllegalArgumentException("Placeholder string cannot be the same as the wildcard placeholder");
-        placeholders.put(placeholder, new PlaceholderCollection<>(collection, stringFunction));
+        placeholders.put(placeholder, new PlaceholderCollection<>(supplier, stringFunction));
     }
 
     /**

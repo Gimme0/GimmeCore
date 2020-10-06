@@ -5,6 +5,8 @@ import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 public class TimeFormat {
 
@@ -65,7 +67,8 @@ public class TimeFormat {
 
         if (seconds > 60) return digitalTimeMinimalized((long) seconds);
 
-        DecimalFormat df = new DecimalFormat("#." + "#".repeat(decimals),
+        String c = "#";
+        DecimalFormat df = new DecimalFormat("#." + IntStream.range(0, decimals).mapToObj(i -> c).collect(Collectors.joining("")),
                 new DecimalFormatSymbols(Locale.ENGLISH));
         df.setMaximumFractionDigits(decimals);
         df.setMinimumFractionDigits(decimals);

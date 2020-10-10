@@ -1,6 +1,7 @@
 package me.gimme.gimmecore.command;
 
 import com.google.common.base.Strings;
+import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.PluginCommand;
@@ -9,6 +10,7 @@ import org.bukkit.permissions.Permission;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 import java.util.function.Function;
@@ -137,8 +139,29 @@ public class CommandManager implements TabExecutor {
      *
      * @param parent the parent command name
      */
-    public void registerBasicHelpCommand(String parent) {
-        register(new BaseHelpCommand(this, parent, null, true) {
+    public void registerBasicHelpCommand(@NotNull String parent) {
+        ChatColor outerColor = ChatColor.GOLD;
+        String header =
+                outerColor + "____________.[ " +
+                        BaseCommand.COLOR_COMMAND + "/" + parent +
+                        ChatColor.DARK_GREEN + " Help (" + BaseHelpCommand.PAGE_PLACEHOLDER + ")" +
+                        outerColor + " ]._______________";
+
+        registerBasicHelpCommand(parent, header);
+    }
+
+    /**
+     * Registers a basic help command for all commands under the specified parent with the specified list header, or
+     * null for no header.
+     * <p>
+     * In the header string, {@link BaseHelpCommand#PAGE_PLACEHOLDER} will be replaced with the current page formatted
+     * like "1/3", where "1" is the current page and "3" is the max page number.
+     *
+     * @param parent the parent command name
+     * @param header the header string displayed above the list
+     */
+    public void registerBasicHelpCommand(@NotNull String parent, @Nullable String header) {
+        register(new BaseHelpCommand(this, parent, header) {
         });
     }
 

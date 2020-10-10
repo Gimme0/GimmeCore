@@ -14,7 +14,7 @@ import java.util.List;
  */
 public abstract class BaseHelpCommand extends BaseCommand {
 
-    protected static final String PAGE_PLACEHOLDER = "%page%";
+    public static final String PAGE_PLACEHOLDER = "%page%";
     private static final String ERROR_PAGE_NUMBER_OOB = "Page must be between 1 and %n%";
 
     private final List<BaseCommand> commandList;
@@ -24,7 +24,7 @@ public abstract class BaseHelpCommand extends BaseCommand {
     private final boolean hideAliases;
 
     protected BaseHelpCommand(@NotNull CommandManager commandManager, @NotNull String parent, @Nullable String header) {
-        this(commandManager, parent, header, false);
+        this(commandManager, parent, header, true);
     }
 
     protected BaseHelpCommand(@NotNull CommandManager commandManager, @NotNull String parent, @Nullable String header,

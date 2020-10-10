@@ -69,37 +69,40 @@ public class CommandManager implements TabExecutor {
                 }
             } else {
                 if (commands.contains(command.getName(), subCommand)) {
-                    String[] subCommandArgs = Arrays.copyOfRange(args, 1, args.length);
-                    Set<String> usedPlaceholders = new HashSet<>();
-                    for (String argsAlternative : commands.get(command.getName(), subCommand).getArgsAlternatives()) {
-                        String[] argsAlternativeArray = argsAlternative.split(" ");
-                        if (subCommandArgs.length > argsAlternativeArray.length) continue;
-                        int currentArgIndex = subCommandArgs.length - 1;
-                        boolean matching = true;
-                        for (int i = 0; i < currentArgIndex; i++) {
-                            if (!subCommandArgs[i].equals(argsAlternativeArray[i]) &&
-                                    !placeholders.containsKey(argsAlternativeArray[i]) &&
-                                    !argsAlternativeArray[i].equals(WILDCARD_PLACEHOLDER)) {
-                                matching = false;
-                                break;
-                            }
-                        }
-                        if (!matching) continue;
-
-                        String currentAltArg = argsAlternativeArray[currentArgIndex];
-                        if (currentAltArg.equals(WILDCARD_PLACEHOLDER)) continue;
-                        if (placeholders.containsKey(currentAltArg)) {
-                            if (!usedPlaceholders.contains(currentAltArg)) {
-                                usedPlaceholders.add(currentAltArg);
-                                for (String s : placeholders.get(currentAltArg).getList()) {
-                                    if (s.toLowerCase().startsWith(subCommandArgs[currentArgIndex].toLowerCase())) {
-                                        result.add(s);
-                                    }
+                    BaseCommand c = commands.get(command.getName(), subCommand);
+                    if (c.isPermitted(sender)) {
+                        String[] subCommandArgs = Arrays.copyOfRange(args, 1, args.length);
+                        Set<String> usedPlaceholders = new HashSet<>();
+                        for (String argsAlternative : c.getArgsAlternatives()) {
+                            String[] argsAlternativeArray = argsAlternative.split(" ");
+                            if (subCommandArgs.length > argsAlternativeArray.length) continue;
+                            int currentArgIndex = subCommandArgs.length - 1;
+                            boolean matching = true;
+                            for (int i = 0; i < currentArgIndex; i++) {
+                                if (!subCommandArgs[i].equals(argsAlternativeArray[i]) &&
+                                        !placeholders.containsKey(argsAlternativeArray[i]) &&
+                                        !argsAlternativeArray[i].equals(WILDCARD_PLACEHOLDER)) {
+                                    matching = false;
+                                    break;
                                 }
                             }
-                        } else {
-                            if (currentAltArg.toLowerCase().startsWith(subCommandArgs[currentArgIndex].toLowerCase())) {
-                                result.add(currentAltArg);
+                            if (!matching) continue;
+
+                            String currentAltArg = argsAlternativeArray[currentArgIndex];
+                            if (currentAltArg.equals(WILDCARD_PLACEHOLDER)) continue;
+                            if (placeholders.containsKey(currentAltArg)) {
+                                if (!usedPlaceholders.contains(currentAltArg)) {
+                                    usedPlaceholders.add(currentAltArg);
+                                    for (String s : placeholders.get(currentAltArg).getList()) {
+                                        if (s.toLowerCase().startsWith(subCommandArgs[currentArgIndex].toLowerCase())) {
+                                            result.add(s);
+                                        }
+                                    }
+                                }
+                            } else {
+                                if (currentAltArg.toLowerCase().startsWith(subCommandArgs[currentArgIndex].toLowerCase())) {
+                                    result.add(currentAltArg);
+                                }
                             }
                         }
                     }

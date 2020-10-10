@@ -45,7 +45,7 @@ public abstract class BaseCommand {
 
     protected static final String newLine = "\n";
 
-    private static final ChatColor COLOR_COMMAND = ChatColor.AQUA;
+    public static final ChatColor COLOR_COMMAND = ChatColor.AQUA;
     private static final ChatColor COLOR_COMMAND_NO_PERMISSION = ChatColor.DARK_RED;
     private static final ChatColor COLOR_ARGS_USAGE = ChatColor.DARK_AQUA;
     private static final ChatColor COLOR_DESCRIPTION = ChatColor.YELLOW;
@@ -85,7 +85,10 @@ public abstract class BaseCommand {
      * @param args   the arguments used for this command
      */
     void handle(@NotNull final CommandSender sender, @NotNull final String[] args) {
-        if (args.length > maxArgs) {
+        if (!isPermitted(sender)) {
+            sender.sendMessage(errorMessage(CommandError.NO_PERMISSION, null));
+            return;
+        } else if (args.length > maxArgs) {
             String superfluousInput = String.join(" ", Arrays.copyOfRange(args, maxArgs, args.length));
             sender.sendMessage(errorMessageWithUsage(CommandError.TOO_MANY_ARGUMENTS, superfluousInput));
             return;
@@ -94,9 +97,6 @@ public abstract class BaseCommand {
             return;
         } else if (playerOnly && !(sender instanceof Player)) {
             sender.sendMessage(errorMessage(CommandError.PLAYER_ONLY, null));
-            return;
-        } else if (!isPermitted(sender)) {
-            sender.sendMessage(errorMessage(CommandError.NO_PERMISSION, null));
             return;
         }
 

@@ -37,6 +37,7 @@ public abstract class BaseHelpCommand extends BaseCommand {
         super(parent, "help");
 
         addAlias("?");
+        addAlias("h");
         setArgsUsage("[page=1]");
         addArgsAlternative("1");
         setMinArgs(0);

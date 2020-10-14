@@ -12,31 +12,36 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.Reader;
-import java.lang.reflect.Type;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 
 public class ConfigUtils {
 
     /**
-     * Gets the YAML config at the specified file path, or creates a new one at that path from the resource with the
-     * same name embedded with the specified plugin's .jar file.
+     * Returns the YAML config at the specified file path. If the file does not exist, a new one is created from the
+     * defaults resource with that name embedded in the specified plugin's jar file.
      *
-     * @param plugin   the plugin that has the resource with the defaults
-     * @param filePath the path to the config
+     * @param plugin   the plugin that has the resource with the default config
+     * @param filePath the path to the config file
      * @return the loaded YAML config
-     * @throws IOException
-     * @throws InvalidConfigurationException
      */
-    public static YamlConfiguration getYamlConfig(Plugin plugin, String filePath) throws IOException, InvalidConfigurationException {
-        File languageFile = new File(plugin.getDataFolder(), filePath);
-        if (!languageFile.isFile()) {
-            Files.createDirectories(languageFile.toPath().getParent());
-            plugin.saveResource(filePath, false);
+    public static YamlConfiguration getYamlConfig(Plugin plugin, String filePath) {
+        File file = new File(plugin.getDataFolder(), filePath);
+        if (!file.isFile()) {
+            try {
+                Files.createDirectories(file.toPath().getParent());
+                plugin.saveResource(filePath, false);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
 
         YamlConfiguration config = new YamlConfiguration();
-        config.load(languageFile);
+        try {
+            config.load(file);
+        } catch (IOException | InvalidConfigurationException e) {
+            e.printStackTrace();
+        }
 
         return config;
     }
@@ -59,8 +64,8 @@ public class ConfigUtils {
     }
 
     /**
-     * Serializes and saves the specified object to the json file at the specified file path.
-     * The gson can be used to register type adapters or add other serialization settings.
+     * Serializes and saves the specified object to the json file at the specified file path. The gson can be used to
+     * register type adapters or add other serialization settings.
      *
      * @param pluginDataFolder the plugin data folder where the json file should be created
      * @param filePath         the file path of the json file
@@ -116,7 +121,8 @@ public class ConfigUtils {
         if (!jsonFile.isFile()) return null;
         Reader reader = new FileReader(jsonFile);
 
-        T o = gson.fromJson(reader, new TypeToken<T>(){}.getType());
+        T o = gson.fromJson(reader, new TypeToken<T>() {
+        }.getType());
 
         reader.close();
         return o;

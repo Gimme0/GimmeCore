@@ -4,12 +4,9 @@ import com.google.common.base.Strings;
 import me.gimme.gimmecore.util.ConfigUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
-
-import java.io.IOException;
 
 public class LanguageManager {
 
@@ -26,11 +23,7 @@ public class LanguageManager {
     public LanguageManager(Plugin plugin, String languageFilePath) {
         this.languageFilePath = languageFilePath;
 
-        try {
-            languageConfig = ConfigUtils.getYamlConfig(plugin, languageFilePath);
-        } catch (IOException | InvalidConfigurationException e) {
-            e.printStackTrace();
-        }
+        languageConfig = ConfigUtils.getYamlConfig(plugin, languageFilePath);
     }
 
     /**
